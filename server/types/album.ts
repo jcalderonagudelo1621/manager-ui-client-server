@@ -1,3 +1,10 @@
+export interface AlbumId{
+  album_id: string,
+}
+export interface QuestionCount{
+  questions_count: BigInteger,
+}
+
 //file types/customer.ts
 
 /* export interface BasicProduct {
@@ -11,9 +18,7 @@
     price: number
   } */
 
-  export interface AlbumId{
-    album_id: string,
-  }
+ 
 /* 
   export interface AlbumData extends AlbumId {
     started_on: number,
