@@ -6,6 +6,8 @@ import reportWebVitals from './reportWebVitals';
 import Header from './components/header';
 import EnhancedTable  from './components/table';
 
+
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
