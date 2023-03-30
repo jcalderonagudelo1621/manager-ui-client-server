@@ -1,6 +1,7 @@
 export interface AlbumId{
   album_id: string,
 }
+//Interface for count of questions answered
 export interface QuestionCount{
   questions_count: BigInteger,
 }

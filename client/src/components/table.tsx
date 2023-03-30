@@ -1,4 +1,6 @@
-import * as React from 'react';
+
+
+import React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -21,37 +23,30 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
-interface Data {
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+
+
+// ################################################################
+/* {
+  "album_id": "0f308ef7-dc76-404b-97ea-974bb94599d9",
+  "error_number": "2",
+  "answered_question_number": 14,
+  "ended_album": "sí",
+  "total_response_time": "56380"
+}, */
+interface IData {
+  // define la estructura de los datos que esperas recibir de la API
   album_id: string; // En 
   error_number: number;
-  question_answered_number: number;
+  answered_question_number: number;
   ended_album: string;
   error_percentage: number;
   total_response_time: number;
+  // ...
 }
 
-function createData(
-  album_id: string,
-  error_number: number,
-  question_answered_number: number,
-  ended_album: string,
-  error_percentage: number,
-  total_response_time: number
-): Data {
-  return {
-  album_id, 
-  error_number,
-  question_answered_number,
-  ended_album,
-  error_percentage,
-  total_response_time,
-  };
-}
-
-const rows = [
-  createData('asqw', 305, 3.7, 'qwerts', 4.3, 8),
-  createData('asqw', 305, 3.7, 'qwerts', 4.3, 8)
-];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -95,7 +90,7 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Data;
+  id: keyof IData;
   label: string;
   numeric: boolean;
 }
@@ -111,37 +106,37 @@ const headCells: readonly HeadCell[] = [
     id: 'error_number',
     numeric: true,
     disablePadding: false,
-    label: 'error_number',
+    label: 'Número de errores',
   },
   {
-    id: 'question_answered_number',
+    id: 'answered_question_number',
     numeric: true,
     disablePadding: false,
-    label: 'question_answered_number',
+    label: 'Número de preguntas respondidas',
   },
   {
     id: 'ended_album',
     numeric: true,
     disablePadding: false,
-    label: 'ended_album',
+    label: 'Finalización del album',
   },
   {
     id: 'error_percentage',
     numeric: true,
     disablePadding: false,
-    label: 'error_percentage',
+    label: 'Porcentaje de error (%)',
   },
   {
     id: 'total_response_time',
     numeric: true,
     disablePadding: false,
-    label: 'total_response_time',
+    label: 'Tiempo total de respuesta',
   },
 ];
 
 interface EnhancedTableProps {
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof IData) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
@@ -152,7 +147,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
     props;
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof IData) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -252,15 +247,38 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 export default function EnhancedTable() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('error_number');
+  const [orderBy, setOrderBy] = React.useState<keyof IData>('error_number');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+  
+// ###############################################3
+const [data, setData] = useState<IData[]>([]);
+  
+useEffect(() => {
+  axios
+    .get("http://localhost:8001/user")
+    .then((res) => {
+      setData(res.data.data);
+      
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}, []);
+
+//##################################################
+//Porcentaje de error
+
+
+//##################################3
+
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof Data,
+    property: keyof IData,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -269,7 +287,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.album_id);
+      const newSelected = data.map((n) => n.album_id);
       setSelected(newSelected);
       return;
     }
@@ -313,7 +331,7 @@ export default function EnhancedTable() {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -331,10 +349,10 @@ export default function EnhancedTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={data.length}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
+              {stableSort(data, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.album_id);
@@ -365,13 +383,13 @@ export default function EnhancedTable() {
                         scope="row"
                         padding="none"
                       >
-                        {row.album_id}
+                        {row.album_id.slice(-5)}
                       </TableCell>
                       <TableCell align="right">{row.error_number}</TableCell>
-                      <TableCell align="right">{row.album_id}</TableCell>
-                      <TableCell align="right">{row.total_response_time}</TableCell>
-                      <TableCell align="right">{row.error_percentage}</TableCell>
+                      <TableCell align="right">{row.answered_question_number}</TableCell>
                       <TableCell align="right">{row.ended_album}</TableCell>
+                      <TableCell align="right">{row.error_percentage}</TableCell>
+                      <TableCell align="right">{row.total_response_time}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -390,7 +408,7 @@ export default function EnhancedTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -401,6 +419,9 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
+      
     </Box>
+
   );
 }
+
