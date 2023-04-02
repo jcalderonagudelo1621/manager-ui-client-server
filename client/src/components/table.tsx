@@ -256,10 +256,10 @@ export default function EnhancedTable() {
   
 // ###############################################3
 const [data, setData] = useState<IData[]>([]);
-  
+
 useEffect(() => {
   axios
-    .get("http://localhost:8001/user")
+    .get("http://localhost:3004/user")//Url api server
     .then((res) => {
       setData(res.data.data);
       
