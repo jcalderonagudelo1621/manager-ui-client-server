@@ -25,6 +25,7 @@ import { visuallyHidden } from '@mui/utils';
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import useSort from '../hooks/useSort';
 
 
 
@@ -252,28 +253,24 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
   
-// ###############################################3
-const [data, setData] = useState<IData[]>([]);
+  // Hooks for query data from server API 
+  const [data, setData] = useState<IData[]>([]);
 
-useEffect(() => {
-  axios
-    .get("http://localhost:3004/user")//Url api server
-    .then((res) => {
-      setData(res.data.data);
-      
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-}, []);
+  useEffect(() => {
+    axios
+      .get("http://localhost:3004/user")//Url api server
+      .then((res) => {
+        setData(res.data.data);
 
-//##################################################
-//Porcentaje de error
-
-
-//##################################3
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    
+  }, []);
+  const dataSorted = useSort(data);
+  console.log(dataSorted)
 
 
   const handleRequestSort = (
@@ -424,4 +421,3 @@ useEffect(() => {
 
   );
 }
-
