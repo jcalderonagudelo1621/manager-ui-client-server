@@ -1,4 +1,6 @@
 import React, { useState, useEffect }from 'react';
+import { getEffectiveTypeParameterDeclarations } from 'typescript';
+// Hook to sort the array by status, less response time and less getEffectiveTypeParameterDeclarations. 
 
 const useSort = (dataToSort: any) => {
     // const [dataSorted, setDataSorted] = useState([])
@@ -14,9 +16,9 @@ const useSort = (dataToSort: any) => {
             if (a.ended_album < b.ended_album) {
                 return 1;
             }
-            //Sort by minor response_time
+            //Sort by less response_time
             return a.total_response_time - b.total_response_time;
-            //Sort by minor error number
+            //Sort by less error number
             return a.error_number - b.error_number
         })
     }
