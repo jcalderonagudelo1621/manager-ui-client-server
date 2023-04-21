@@ -73,10 +73,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   // stabilizedThis.sort((a, b) => {
@@ -270,9 +266,9 @@ export default function EnhancedTable() {
     
   }, []);
 
-  //Use of hooks useSort
+  //Use of hook useSort to 
   const dataSorted = useSort(data);
-  console.log(dataSorted)
+  // console.log(dataSorted)
 
 
   const handleRequestSort = (
