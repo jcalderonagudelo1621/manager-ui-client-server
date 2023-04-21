@@ -25,6 +25,7 @@ import { visuallyHidden } from '@mui/utils';
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import useSort from '../hooks/useSort';
 
 
 
@@ -72,19 +73,15 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
+  // stabilizedThis.sort((a, b) => {
+  //   const order = comparator(a[0], b[0]);
+  //   if (order !== 0) {
+  //     return order;
+  //   }
+  //   return a[1] - b[1];
+  // });
   return stabilizedThis.map((el) => el[0]);
 }
 
@@ -252,28 +249,26 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
   
-// ###############################################3
-const [data, setData] = useState<IData[]>([]);
-  
-useEffect(() => {
-  axios
-    .get("http://localhost:8001/user")
-    .then((res) => {
-      setData(res.data.data);
-      
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-}, []);
+  // Hooks for query data from server API 
+  const [data, setData] = useState<IData[]>([]);
 
-//##################################################
-//Porcentaje de error
+  useEffect(() => {
+    axios
+      .get("http://localhost:3004/user")//Url api server
+      .then((res) => {
+        setData(res.data.data);
 
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    
+  }, []);
 
-//##################################3
+  //Use of hook useSort to 
+  const dataSorted = useSort(data);
+  // console.log(dataSorted)
 
 
   const handleRequestSort = (
@@ -424,4 +419,3 @@ useEffect(() => {
 
   );
 }
-
